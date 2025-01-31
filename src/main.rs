@@ -14,6 +14,10 @@ struct Args {
     /// Model to use for generating commit messages
     #[arg(short, long)]
     model: Option<String>,
+
+    /// Files to commit. Use "." for all changes, or specify individual files
+    #[arg(default_value = None)]
+    files: Option<Vec<String>>,
 }
 
 async fn get_available_models() -> Result<Vec<String>> {
@@ -97,6 +101,32 @@ async fn ensure_model_available(model: &str) -> Result<()> {
     Ok(())
 }
 
+fn stage_files(files: &Option<Vec<String>>) -> Result<()> {
+    match files {
+        Some(files) => {
+            for file in files {
+                if file == "." {
+                    let status = Command::new("git")
+                        .args(["add", "."])
+                        .status()?;
+                    if !status.success() {
+                        return Err(anyhow!("Failed to stage all files"));
+                    }
+                } else {
+                    let status = Command::new("git")
+                        .args(["add", file])
+                        .status()?;
+                    if !status.success() {
+                        return Err(anyhow!("Failed to stage file: {}", file));
+                    }
+                }
+            }
+        }
+        None => {} // Don't stage anything if no files specified
+    }
+    Ok(())
+}
+
 fn get_git_diff() -> Result<String> {
     let output = Command::new("git")
         .args(["diff", "--cached"])
@@ -143,6 +173,9 @@ async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = Args::parse();
+
+    // Stage files if specified
+    stage_files(&args.files)?;
 
     // Ensure Ollama is running
     ensure_ollama_running().await?;

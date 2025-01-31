@@ -12,6 +12,7 @@ A powerful CLI tool that generates conventional commit messages using local LLMs
 - 🎯 Supports multiple Ollama models
 - 🚀 Fast and efficient
 - 💻 Works offline with local models
+- 📝 Automatic git staging with smart file selection
 
 ## 📦 Installation
 
@@ -43,21 +44,32 @@ cargo install --path .
 
 ### Basic Usage
 
-Simply run in your git repository:
+1. Stage and commit all changes:
+```bash
+cmgenius .
+```
 
+2. Stage and commit specific files:
+```bash
+cmgenius file1.rs file2.rs
+```
+
+3. Commit already staged changes:
 ```bash
 cmgenius
 ```
-
-This will:
-1. Check your git diff
-2. Generate a conventional commit message
-3. Create a commit with the generated message
 
 ### Advanced Usage
 
 Use a different model:
 ```bash
+# Stage and commit all changes with a specific model
+cmgenius . --model codellama
+
+# Stage and commit specific files with a specific model
+cmgenius file1.rs file2.rs --model codellama
+
+# Commit staged changes with a specific model
 cmgenius --model codellama
 ```
 
@@ -72,7 +84,13 @@ Available models:
 ### Examples
 
 ```bash
-# Use with specific model
+# Stage and commit all changes
+cmgenius .
+
+# Stage and commit specific files
+cmgenius src/main.rs Cargo.toml
+
+# Commit already staged changes with a specific model
 cmgenius --model codellama
 
 # View available options
@@ -85,7 +103,7 @@ Contributions are welcome! Here's how you can help:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes using Commitgenius! (`cmgenius`)
+3. Commit your changes using Commitgenius! (`cmgenius .`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
