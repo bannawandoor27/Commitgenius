@@ -3,7 +3,7 @@ Version: 0.2.1
 Section: utils
 Priority: optional
 Architecture: amd64
-Maintainer: Muhammed Banna <bannawandoor27@gmail.com>
+Maintainer: Hasanul Banna <bannawandoor27@gmail.com>
 Description: AI-powered CLI tool for generating conventional commit messages
  Commitgenius is a command-line tool that uses local LLMs via Ollama
  to generate conventional commit messages from git diffs.

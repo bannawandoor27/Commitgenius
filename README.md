@@ -136,6 +136,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-Muhammed Banna - [@bannawandoor27](https://github.com/bannawandoor27)
+Hasanul Banna - [@bannawandoor27](https://github.com/bannawandoor27)
 
 Project Link: [https://github.com/bannawandoor27/Commitgenius](https://github.com/bannawandoor27/Commitgenius)

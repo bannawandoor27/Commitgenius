@@ -2,7 +2,7 @@
 name = "commitgenius"
 version = "0.2.1"
 edition = "2021"
-authors = ["Muhammed Banna <bannawandoor27@gmail.com>"]
+authors = ["Hasanul Banna <bannawandoor27@gmail.com>"]
 description = "An AI-powered CLI tool that generates conventional commit messages using local LLMs via Ollama"
 repository = "https://github.com/bannawandoor27/Commitgenius"
 license = "MIT"
