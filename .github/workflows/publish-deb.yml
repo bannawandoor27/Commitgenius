@@ -1,0 +1,51 @@
+name: Publish Debian Package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential debhelper devscripts
+
+      - name: Build Debian package
+        run: |
+          debuild -us -uc
+          
+      - name: Setup GPG
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
+          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode loopback --passphrase-fd 0 --sign --armor --output /dev/null /dev/null
+
+      - name: Create APT repository
+        run: |
+          mkdir -p apt/pool/main
+          mv ../*.deb apt/pool/main/
+          
+          cd apt
+          mkdir -p dists/stable/main/binary-amd64
+          
+          # Generate Packages file
+          dpkg-scanpackages pool/main /dev/null > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+          
+          # Generate Release file
+          cd dists/stable
+          apt-ftparchive release . > Release
+          gpg --default-key bannawandoor27@gmail.com -abs -o Release.gpg Release
+          gpg --default-key bannawandoor27@gmail.com --clearsign -o InRelease Release
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apt
+          force_orphan: true

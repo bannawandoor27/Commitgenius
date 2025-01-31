@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_build:
+	# No build needed, we'll install via cargo in postinst
+
+override_dh_auto_install:
+	# No installation needed here
+
+override_dh_auto_test:
+	# Skip tests

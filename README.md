@@ -29,6 +29,20 @@ brew tap bannawandoor27/Commitgenius
 brew install commitgenius
 ```
 
+### Using APT (Debian/Ubuntu)
+
+```bash
+# Add GPG key
+curl -fsSL https://bannawandoor27.github.io/Commitgenius/apt-repo/KEY.gpg | sudo gpg --dearmor -o /usr/share/keyrings/commitgenius-archive-keyring.gpg
+
+# Add repository
+echo "deb [signed-by=/usr/share/keyrings/commitgenius-archive-keyring.gpg] https://bannawandoor27.github.io/Commitgenius/apt-repo stable main" | sudo tee /etc/apt/sources.list.d/commitgenius.list
+
+# Update and install
+sudo apt update
+sudo apt install commitgenius
+```
+
 ### Prerequisites
 
 - [Ollama](https://ollama.ai/) must be installed on your system

@@ -1,0 +1,31 @@
+name: Update APT Repository
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  update-apt-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up GPG
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --import
+          echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --pinentry-mode loopback --passphrase-fd 0 --sign --armor --output /dev/null /dev/null
+      
+      - name: Build and update APT repository
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev apt-utils
+          cd apt-repo
+          bash update-repo.sh
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./apt-repo
+          force_orphan: true
