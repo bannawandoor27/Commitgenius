@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  packages: write
 
 jobs:
   create-release:
@@ -37,26 +36,3 @@ jobs:
       - uses: katyo/publish-crates@v2
         with:
           registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-
-  publish-homebrew:
-    needs: create-release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout homebrew-commitgenius
-        uses: actions/checkout@v2
-        with:
-          repository: bannawandoor27/homebrew-commitgenius
-          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          path: homebrew-commitgenius
-      
-      - name: Update Formula
-        working-directory: homebrew-commitgenius
-        run: |
-          version=${GITHUB_REF#refs/tags/v}
-          sha=$(curl -L "https://github.com/bannawandoor27/Commitgenius/archive/refs/tags/v${version}.tar.gz" | shasum -a 256 | cut -d ' ' -f 1)
-          sed -i "s/REPLACE_AFTER_RELEASE/${sha}/" commitgenius.rb
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git add commitgenius.rb
-          git commit -m "Update commitgenius to ${version}"
-          git push

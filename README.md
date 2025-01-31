@@ -16,7 +16,7 @@ A powerful CLI tool that generates conventional commit messages using local LLMs
 
 ## 📦 Installation
 
-### Using Cargo (Recommended)
+### Using Cargo (All Platforms)
 
 ```bash
 cargo install commitgenius
@@ -25,32 +25,14 @@ cargo install commitgenius
 ### Using Homebrew (macOS and Linux)
 
 ```bash
-brew install bannawandoor27/commitgenius/commitgenius
-```
-
-### Using APT (Debian/Ubuntu)
-
-```bash
-cargo install commitgenius
-```
-
-### Building from Source
-
-1. Clone the repository:
-```bash
-git clone https://github.com/bannawandoor27/Commitgenius.git
-cd Commitgenius
-```
-
-2. Build and install:
-```bash
-cargo install --path .
+brew tap bannawandoor27/Commitgenius
+brew install commitgenius
 ```
 
 ### Prerequisites
 
 - [Ollama](https://ollama.ai/) must be installed on your system
-- Rust and Cargo (if building from source)
+- Rust and Cargo (if installing via cargo)
 
 ## 🚀 Usage
 
