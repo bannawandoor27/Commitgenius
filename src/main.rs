@@ -2,6 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use commitgenius::{ai, git, github};
 use dotenv::dotenv;
+use serde_json::json;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -21,6 +22,58 @@ struct Args {
     /// Base branch for pull request (default: develop)
     #[arg(short, long, default_value = "develop")]
     base: String,
+}
+
+fn clean_commit_message(message: &str) -> String {
+    // Only clean if the message starts and ends with code block markers
+    if message.trim().starts_with("```") && message.trim().ends_with("```") {
+        message
+            .trim()
+            .replace("```", "")
+            .lines()
+            .map(|line| line.trim())
+            .filter(|line| !line.is_empty())
+            .collect::<Vec<&str>>()
+            .join("\n")
+    } else {
+        message.trim().to_string()
+    }
+}
+
+async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
+    println!("Generating commit message for changes using {}...", model);
+    
+    let client = reqwest::Client::new();
+    let prompt = format!(
+        "Generate a conventional commit message for the following git diff. \
+         IMPORTANT RULES:\n\
+         1. Use the format: <type>(<scope>): <description>\n\
+         2. Keep it concise and clear\n\
+         3. DO NOT use any markdown formatting\n\
+         4. DO NOT wrap the message in code blocks\n\
+         5. DO NOT add any extra formatting or annotations\n\
+         6. The message should be ready to use with 'git commit -m'\n\n\
+         Diff:\n{}", 
+        diff
+    );
+
+    println!("Sending request to Ollama...");
+    let response = client.post("http://localhost:11434/api/generate")
+        .json(&json!({
+            "model": model,
+            "prompt": prompt,
+            "stream": false
+        }))
+        .send()
+        .await?;
+
+    println!("Got response from Ollama, parsing...");
+    let response_json: serde_json::Value = response.json().await?;
+    let message = response_json["response"]
+        .as_str()
+        .ok_or_else(|| anyhow::anyhow!("Invalid response format"))?;
+
+    Ok(clean_commit_message(message))
 }
 
 #[tokio::main]
@@ -55,7 +108,7 @@ async fn main() -> Result<()> {
     }
 
     // Generate and create commit
-    let commit_message = ai::generate_commit_message(&selected_model, &diff).await?;
+    let commit_message = generate_commit_message(&selected_model, &diff).await?;
     git::create_commit(&commit_message)?;
     println!("Created commit: {}", commit_message);
 
