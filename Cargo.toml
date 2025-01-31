@@ -2,6 +2,13 @@
 name = "commitgenius"
 version = "0.1.0"
 edition = "2021"
+authors = ["Muhammed Banna <bannawandoor27@gmail.com>"]
+description = "An AI-powered CLI tool that generates conventional commit messages using local LLMs via Ollama"
+repository = "https://github.com/bannawandoor27/Commitgenius"
+license = "MIT"
+keywords = ["git", "commit", "ai", "ollama", "conventional-commits"]
+categories = ["command-line-utilities", "development-tools"]
+readme = "README.md"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }
