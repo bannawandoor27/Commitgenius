@@ -16,6 +16,24 @@ A powerful CLI tool that generates conventional commit messages using local LLMs
 
 ## 📦 Installation
 
+### Using Homebrew (macOS)
+
+```bash
+brew tap bannawandoor27/commitgenius
+brew install commitgenius
+```
+
+### Using APT (Debian/Ubuntu)
+
+```bash
+# Add our repository
+echo "deb [trusted=yes] https://apt.commitgenius.dev/ /" | sudo tee /etc/apt/sources.list.d/commitgenius.list
+
+# Update package list and install
+sudo apt update
+sudo apt install commitgenius
+```
+
 ### Using Cargo (Recommended)
 
 ```bash
