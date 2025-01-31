@@ -140,15 +140,19 @@ fn get_git_diff() -> Result<String> {
 }
 
 fn clean_commit_message(message: &str) -> String {
-    // Remove code block markers and extra whitespace
-    message
-        .trim()
-        .replace("```", "")
-        .lines()
-        .map(|line| line.trim())
-        .filter(|line| !line.is_empty())
-        .collect::<Vec<&str>>()
-        .join("\n")
+    // Only clean if the message starts and ends with code block markers
+    if message.trim().starts_with("```") && message.trim().ends_with("```") {
+        message
+            .trim()
+            .replace("```", "")
+            .lines()
+            .map(|line| line.trim())
+            .filter(|line| !line.is_empty())
+            .collect::<Vec<&str>>()
+            .join("\n")
+    } else {
+        message.trim().to_string()
+    }
 }
 
 async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
@@ -156,8 +160,15 @@ async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
     
     let client = reqwest::Client::new();
     let prompt = format!(
-        "Generate a concise conventional commit message for the following git diff. \
-         Use the format: <type>(<scope>): <description> without any markdown or code formatting.\n\nDiff:\n{}", 
+        "Generate a conventional commit message for the following git diff. \
+         IMPORTANT RULES:\n\
+         1. Use the format: <type>(<scope>): <description>\n\
+         2. Keep it concise and clear\n\
+         3. DO NOT use any markdown formatting\n\
+         4. DO NOT wrap the message in code blocks\n\
+         5. DO NOT add any extra formatting or annotations\n\
+         6. The message should be ready to use with 'git commit -m'\n\n\
+         Diff:\n{}", 
         diff
     );
 
