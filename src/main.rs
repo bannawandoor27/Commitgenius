@@ -98,21 +98,15 @@ async fn ensure_model_available(model: &str) -> Result<()> {
 }
 
 fn get_git_diff() -> Result<String> {
-    let repo = Repository::open(".")?;
-    let mut diff_string = String::new();
+    let output = Command::new("git")
+        .args(["diff", "--cached"])
+        .output()?;
 
-    for entry in repo.statuses(None)?.iter() {
-        if entry.status() != Status::CURRENT {
-            let old_file = repo.find_blob(entry.head_to_index().unwrap().old_id())?;
-            let new_file = repo.find_blob(entry.head_to_index().unwrap().new_id())?;
-            
-            diff_string.push_str(&format!("File: {}\n", entry.path().unwrap()));
-            diff_string.push_str(&format!("Old:\n{}\n", String::from_utf8_lossy(&old_file.content())));
-            diff_string.push_str(&format!("New:\n{}\n", String::from_utf8_lossy(&new_file.content())));
-        }
+    if !output.status.success() {
+        return Err(anyhow!("Failed to get git diff"));
     }
 
-    Ok(diff_string)
+    Ok(String::from_utf8(output.stdout)?)
 }
 
 async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
