@@ -1,1 +1,2 @@
 This is a test file to verify CommitGenius functionality.
+testing pr-genius functionality
