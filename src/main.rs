@@ -139,13 +139,25 @@ fn get_git_diff() -> Result<String> {
     Ok(String::from_utf8(output.stdout)?)
 }
 
+fn clean_commit_message(message: &str) -> String {
+    // Remove code block markers and extra whitespace
+    message
+        .trim()
+        .replace("```", "")
+        .lines()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty())
+        .collect::<Vec<&str>>()
+        .join("\n")
+}
+
 async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
     println!("Generating commit message for changes using {}...", model);
     
     let client = reqwest::Client::new();
     let prompt = format!(
         "Generate a concise conventional commit message for the following git diff. \
-         Use the format: <type>(<scope>): <description>\n\nDiff:\n{}", 
+         Use the format: <type>(<scope>): <description> without any markdown or code formatting.\n\nDiff:\n{}", 
         diff
     );
 
@@ -163,11 +175,9 @@ async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
     let response_json: Value = response.json().await?;
     let message = response_json["response"]
         .as_str()
-        .ok_or_else(|| anyhow!("Invalid response format"))?
-        .trim()
-        .to_string();
+        .ok_or_else(|| anyhow!("Invalid response format"))?;
 
-    Ok(message)
+    Ok(clean_commit_message(message))
 }
 
 #[tokio::main]
