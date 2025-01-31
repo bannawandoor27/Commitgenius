@@ -1,3 +1,6 @@
+// Commitgenius - An AI-powered conventional commit message generator
+// Uses Ollama for local LLM inference to create meaningful commit messages
+
 use anyhow::{Context, Result};
 use clap::Parser;
 use git2::Repository;
