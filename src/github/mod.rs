@@ -11,17 +11,18 @@ pub struct GithubClient {
 impl GithubClient {
     pub fn new() -> Result<Self> {
         let token = env::var("GITHUB_TOKEN")
-            .map_err(|_| anyhow::anyhow!("GITHUB_TOKEN environment variable not set"))?;
+            .map_err(|_| anyhow::anyhow!("GITHUB_TOKEN not found in environment. Please set it in your .env file"))?;
         
         let owner = env::var("GITHUB_REPO_OWNER")
-            .map_err(|_| anyhow::anyhow!("GITHUB_REPO_OWNER environment variable not set"))?;
+            .map_err(|_| anyhow::anyhow!("GITHUB_REPO_OWNER not found in environment. Please set it in your .env file"))?;
         
         let repo = env::var("GITHUB_REPO_NAME")
-            .map_err(|_| anyhow::anyhow!("GITHUB_REPO_NAME environment variable not set"))?;
+            .map_err(|_| anyhow::anyhow!("GITHUB_REPO_NAME not found in environment. Please set it in your .env file"))?;
 
         let client = Octocrab::builder()
             .personal_token(token)
-            .build()?;
+            .build()
+            .map_err(|e| anyhow::anyhow!("Failed to create GitHub client: {}", e))?;
 
         Ok(Self {
             client,
@@ -42,7 +43,8 @@ impl GithubClient {
             .create(title, head, base)
             .body(body)
             .send()
-            .await?;
+            .await
+            .map_err(|e| anyhow::anyhow!("Failed to create pull request: {}", e))?;
 
         Ok(())
     }

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 use commitgenius::{ai, git, github};
-use std::env;
+use dotenv::dotenv;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -25,6 +25,9 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Load environment variables from .env file
+    dotenv().ok();
+
     let args = Args::parse();
 
     // Stage files if specified
@@ -60,19 +63,27 @@ async fn main() -> Result<()> {
     if args.pull_request {
         let current_branch = git::get_current_branch()?;
         let commits = git::get_commits_since_base(&args.base)?;
-        
+
         if commits.is_empty() {
             return Err(anyhow::anyhow!("No commits to create PR for"));
         }
 
         let pr_description = ai::generate_pr_description(&selected_model, &commits, &diff).await?;
-        
+
         let github_client = github::GithubClient::new()?;
         github_client
-            .create_pull_request(&commit_message, &pr_description, &current_branch, &args.base)
+            .create_pull_request(
+                &commit_message,
+                &pr_description,
+                &current_branch,
+                &args.base,
+            )
             .await?;
-        
-        println!("Created pull request from {} to {}", current_branch, args.base);
+
+        println!(
+            "Created pull request from {} to {}",
+            current_branch, args.base
+        );
     }
 
     Ok(())
