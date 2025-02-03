@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CommitGenius - AI-powered commit message generator using local LLMs via Ollama">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <title>CommitGenius - AI-Powered Commit Messages</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo"><img src="logo.svg" alt="CommitGenius Logo" style="width: 32px; height: 32px; margin-right: 8px;">CommitGenius</div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#installation">Installation</a>
+                <a href="#usage">Usage</a>
+                <a href="https://github.com/bannawandoor27/Commitgenius" class="github-link">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Write Better Commits with AI</h1>
+                <p class="hero-subtitle">Generate conventional commit messages using local LLMs via Ollama. Say goodbye to writing commit messages manually!</p>
+                <div class="cta-buttons">
+                    <a href="#installation" class="cta-primary">Get Started</a>
+                    <a href="#usage" class="cta-secondary">Learn More</a>
+                </div>
+                <div class="badges">
+                    <img src="https://img.shields.io/crates/v/commitgenius.svg" alt="Crate version">
+                    <img src="https://img.shields.io/crates/d/commitgenius.svg" alt="Downloads">
+                    <img src="https://img.shields.io/github/license/bannawandoor27/Commitgenius.svg" alt="License">
+                </div>
+            </div>
+            <div class="terminal-demo">
+                <div class="terminal-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                </div>
+                <code>$ cmgenius .
+> Analyzing changes...
+> Generating commit message...
+
+feat(core): implement AI-powered commit message generation
+
+- Add integration with Ollama for local LLM support
+- Implement conventional commit format parsing
+- Add support for multiple model selection</code>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <h2>Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <i class="fas fa-robot"></i>
+                    <h3>AI-Powered</h3>
+                    <p>Leverages local LLMs through Ollama for intelligent commit message generation.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-bolt"></i>
+                    <h3>Lightning Fast</h3>
+                    <p>Generates commit messages in seconds using local processing power.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Privacy First</h3>
+                    <p>All processing happens locally - your code never leaves your machine.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="installation" class="installation">
+            <h2>Installation</h2>
+            <div class="install-options">
+                <div class="install-card">
+                    <h3>Using Cargo</h3>
+                    <pre><code>cargo install commitgenius</code></pre>
+                </div>
+                <div class="install-card">
+                    <h3>Using APT (Debian/Ubuntu)</h3>
+                    <pre><code>curl -s --compressed "https://bannawandoor27.github.io/Commitgenius/apt-repo/KEY.gpg" | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/commitgenius.gpg
+sudo curl -s --compressed -o /etc/apt/sources.list.d/commitgenius.list "https://bannawandoor27.github.io/Commitgenius/apt-repo/commitgenius.list"
+sudo apt update
+sudo apt install commitgenius</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="usage" class="usage">
+            <h2>How to Use</h2>
+            <div class="usage-steps">
+                <div class="step">
+                    <span class="step-number">1</span>
+                    <h3>Stage Your Changes</h3>
+                    <p>Stage your changes using the dot notation or specify files:</p>
+                    <pre><code>cmgenius .</code></pre>
+                </div>
+                <div class="step">
+                    <span class="step-number">2</span>
+                    <h3>Select Model (Optional)</h3>
+                    <p>Choose a specific Ollama model:</p>
+                    <pre><code>cmgenius --model qwen2.5:7b .</code></pre>
+                </div>
+                <div class="step">
+                    <span class="step-number">3</span>
+                    <h3>Review & Commit</h3>
+                    <p>CommitGenius will analyze your changes and create a conventional commit message automatically!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Made with ❤️ by <a href="https://github.com/bannawandoor27">Hasanul Banna</a></p>
+            <div class="footer-links">
+                <a href="https://github.com/bannawandoor27/Commitgenius">GitHub</a>
+                <a href="https://crates.io/crates/commitgenius">Crates.io</a>
+                <a href="https://github.com/bannawandoor27/Commitgenius/issues">Report Issues</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
