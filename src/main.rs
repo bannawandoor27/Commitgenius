@@ -1,12 +1,11 @@
-// Commitgenius - An AI-powered conventional commit message generator
-// Uses Ollama for local LLM inference to create meaningful commit messages
-
 use std::process::Command;
 use clap::Parser;
 use anyhow::{Result, anyhow};
 use reqwest;
 use serde_json::{json, Value};
 use git2::{Repository, Status};
+
+const DIFF_SIZE_THRESHOLD: usize = 1000; // adjust threshold as needed
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -139,8 +138,8 @@ fn get_git_diff() -> Result<String> {
     Ok(String::from_utf8(output.stdout)?)
 }
 
+/// Remove unwanted formatting from the generated commit message.
 fn clean_commit_message(message: &str) -> String {
-    // Only clean if the message starts and ends with code block markers
     if message.trim().starts_with("```") && message.trim().ends_with("```") {
         message
             .trim()
@@ -155,12 +154,47 @@ fn clean_commit_message(message: &str) -> String {
     }
 }
 
+/// Summarize a large git diff using the LLM.
+/// This helps avoid hallucinations on large inputs.
+async fn summarize_diff(model: &str, diff: &str) -> Result<String> {
+    println!("Diff is large ({} characters). Summarizing diff...", diff.len());
+    let client = reqwest::Client::new();
+    let summary_prompt = format!(
+        "Summarize the following git diff in a concise and factual manner. Focus on key changes, file names, and types of modifications. \
+         Do not use code blocks, markdown, or extra commentary.\n\nDiff:\n{}",
+         diff
+    );
+    
+    let response = client.post("http://localhost:11434/api/generate")
+        .json(&json!({
+            "model": model,
+            "prompt": summary_prompt,
+            "stream": false
+        }))
+        .send()
+        .await?;
+    
+    let response_json: Value = response.json().await?;
+    let summary = response_json["response"]
+        .as_str()
+        .ok_or_else(|| anyhow!("Invalid summary response format"))?;
+    
+    Ok(summary.trim().to_string())
+}
+
+/// Generate the commit message. If the diff is too large, summarize it first.
 async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
     println!("Generating commit message for changes using {}...", model);
     
+    let effective_diff = if diff.len() > DIFF_SIZE_THRESHOLD {
+        summarize_diff(model, diff).await?
+    } else {
+        diff.to_string()
+    };
+
     let client = reqwest::Client::new();
     let prompt = format!(
-        "Generate a conventional commit message for the following git diff. \
+        "Generate a conventional commit message for the following git diff summary. \
          IMPORTANT RULES:\n\
          1. Use the format: <type>(<scope>): <description>\n\
          2. Keep it concise and clear\n\
@@ -168,8 +202,8 @@ async fn generate_commit_message(model: &str, diff: &str) -> Result<String> {
          4. DO NOT wrap the message in code blocks\n\
          5. DO NOT add any extra formatting or annotations\n\
          6. The message should be ready to use with 'git commit -m'\n\n\
-         Diff:\n{}", 
-        diff
+         Diff Summary:\n{}", 
+        effective_diff
     );
 
     println!("Sending request to Ollama...");
@@ -219,7 +253,7 @@ async fn main() -> Result<()> {
         return Err(anyhow!("No changes to commit"));
     }
 
-    // Generate commit message
+    // Generate commit message (with summarization if needed)
     let commit_message = generate_commit_message(&selected_model, &diff).await?;
 
     // Create commit
